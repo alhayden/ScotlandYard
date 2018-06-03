@@ -14,6 +14,7 @@ class Game:
         self.x = None
         self.load_board()
         self.round = 0
+        self.turn = 0
         self.reveal_rounds = [3, 8, 13, 18, 24]
         
         
@@ -34,56 +35,71 @@ class Game:
             
         
     def next_turn(self):
-        pass # TODO: run the next turn
-
-    def next_round(self):
-        self.round += 1
-
-        detectives_public = [copy.deepcopy(p) for p in self.detectives]
-        x_public = copy.deepcopy(self.x)
-
-        self.mr_x_ai.play_move(x_public, detectives_public, copy.deepcopy(self.x_history))
+        turn = self.turn
+        self.turn += 1
+        
+        ## Mr. X's turn
+        if turn == 0:
+             self.mr_x_ai.play_move(self.x_public, self.detectives_public, copy.deepcopy(self.x_history))
 
         if self.x != x_public:
             self.gameEnd(False) ## X loses
-        if self.moveValid(x_public):
-            self.x.pos = x_public.nextMove[0]
-            transport = x_public.nextMove[1]
-            self.x.tickets[transport] = self.x.tickets[transport] - 1
+
+        if x_public.nextMove[1] == "2x":
+            self.turn = 0
+            return
+
+            if self.moveValid(x_public):
+                self.x.pos = self.x_public.nextMove[0]
+                transport = self.x_public.nextMove[1]
+                self.x.tickets[transport] = self.x.tickets[transport] - 1
             if self.x.tickets[transport] < 0:
                 self.gameEnd(False) ## X loses
 
             self.x_history.append((self.x.pos, transport))
+            return
 
-        self.checkGameOver()
-        
+        ## Detective's turn
         for i in range(len(self.x_history)):
             if i in self.reveal_rounds:
                 x_history_public.append(self.x_history[i])
             else:
                 x_history_public.append((None, self.x_history[i][1]))
 
-        self.detectives_ai.play_move(detectives_public, copy.deepcopy(x_history_public))
+        detective_public = self.detectives_public[turn - 1]
+
+        self.detectives_ai.play_move(detective_public, self.detectives_public, copy.deepcopy(x_history_public))
 
 
-        for i in range(len(self.detectives)):
-            detective = self.detectives[i]
-            detective_public = detectives_public[i]
-            if detective != detective_public:
-                self.gameEnd(True) #X wins
+        detective = self.detectives[turn - 1]
+        if detective != detective_public:
+            self.gameEnd(True) #X wins
 
-            if detective_public.nextMove == None and self.cantMove(detective_public):
-                continue
+        if detective_public.nextMove == None and self.cantMove(detective_public):
+            return
 
-            if self.moveValid(detective_public):
-                detective.pos = detective_public.nextMove[0]
-                transport = detective_public.nextMove[1]
-                detective.tickets[transport] = detective.tickets[transport] - 1
-                if detective.tickets[transport] < 0:
-                    self.gameEnd(True) ## X wins
+        if self.moveValid(detective_public):
+            detective.pos = detective_public.nextMove[0]
+            transport = detective_public.nextMove[1]
+            detective.tickets[transport] = detective.tickets[transport] - 1
+            if detective.tickets[transport] < 0:
+                self.gameEnd(True) ## X wins
 
         self.checkGameOver()
+        
+ 
 
+    def next_round(self):
+        self.round += 1
+
+        self.detectives_public = [copy.deepcopy(p) for p in self.detectives]
+        self.x_public = copy.deepcopy(self.x)
+
+        self.turn = 0
+        while self.turn < 6:
+            self.next_turn()
+
+        
     def moveValid(self, player):
         return player.nextMove[0] in self.boardmap[player.pos][player.nextMove[1]]
 
@@ -93,6 +109,14 @@ class Game:
                 return False
         return True
 
+    def checkGameOver(self):
+        return any(mrx.pos == plr.pos for plr in self.detectives)
+
+    def gameEnd(self, xwins):
+        if xwins:
+            print("Mr. X won!")
+        else:
+            prin("The Detectives Won!")
 
     def load_board(self):
         t = "t"
