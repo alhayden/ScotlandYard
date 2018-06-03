@@ -1,52 +1,26 @@
 #!/bin/python
 
 ## Master program for running games
-## Loads AIs from their respective files
+## Loads AIs from their respective files and starts the game
 
-
-try:
-    import mrx
-except:
-    print("Failed to load Mr. X AI.  Make sure it is in this directory and named 'mrx.py'")
-try:
-    import detectives
-except:
-    print("Failed to load the detective AI.  Make sure it is in this directory and named 'detectives.py'")
-
-
-def load():
-    global auto, output_level
-    auto = False
-    output_level = 0
-    try:
-        f = open("config.txt", "r")
-        
-
-        f.close()
-    except:
-        print("Failed to load config file, continuing with defaults...")
-        f = open("config.txt", "w")
-        f.write("## Scotland yard master config\n")
-        
-        f.write("# Ask for input before running round?\n")
-        f.write("autorun: true\n")
-        
-        f.write("# detail of game logging, 'all', 'board', 'players'\n")
-        f.write("detail: all\n")
-        f.close()
-
-
-
-
+from engine.game import Game
+from gui import Window
 
 def main():
-    global auto
+    try:
+        import mrx
+    except:
+        print("Failed to load Mr. X AI.  Make sure it is in this directory and named 'mrx.py'")
+        exit(1)
+    try:
+        import detectives
+    except:
+        print("Failed to load the detective AI.  Make sure it is in this directory and named 'detectives.py'")
+        exit(1)
+    the_game = Game(mrx, detectives)
+    win = Window(the_game)
 
-    load()
-    
-    ticketHistory = []
-    
-    
+    win.mainloop()
 
 if __name__ == "__main__":
     main()

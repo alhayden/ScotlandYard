@@ -5,15 +5,6 @@ import random
 
 class Game:
     def __init__(self, mr_x, detectives):
-        try:
-            import mrx
-        except:
-            print("Failed to load Mr. X AI.  Make sure it is in this directory and named 'mrx.py'")
-        try:
-            import detectives
-        except:
-            print("Failed to load the detective AI.  Make sure it is in this directory and named 'detectives.py'")
-
         self.boardmap = {}
         self.x_history = []
         self.detectives = []
