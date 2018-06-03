@@ -2,8 +2,9 @@
 
 class Game:
     def __init__(self, mr_x, detectives):
-        pass # TODO: do some initalization
-
+       self.detectives = []
+       self.x = "X"
+        
     def next_turn(self):
         pass # TODO: run the next turn
 
