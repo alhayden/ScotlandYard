@@ -5,6 +5,8 @@ import random
 
 class Game:
     def __init__(self, mr_x, detectives):
+        self.detectives = detectives
+        self.mr_x = mr_x
         self.boardmap = {}
         self.x_history = []
         self.detectives = []
@@ -39,7 +41,7 @@ class Game:
         detectives_public = [copy.deepcopy(p) for p in self.detectives]
         x_public = copy.deepcopy(self.x)
 
-        mrx.play_move(x_public, detectives_public, copy.deepcopy(self.x_history))
+        self.mr_x.play_move(x_public, detectives_public, copy.deepcopy(self.x_history))
 
         if self.x != x_public:
             self.gameEnd(False) ## X loses
@@ -60,7 +62,7 @@ class Game:
             else:
                 x_history_public.append((None, self.x_history[i][1]))
 
-        detectives.play_move(detectives_public, copy.deepcopy(x_history_public))
+        self.detectives.play_move(detectives_public, copy.deepcopy(x_history_public))
 
 
         for i in range(len(self.detectives)):
