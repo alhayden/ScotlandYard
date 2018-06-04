@@ -15,7 +15,7 @@ class Game:
         self.x = None
         self.load_board()
         self.round = 0
-        self.turn = 0
+        self.turn = 1
         self.reveal_rounds = [3, 8, 13, 18, 24]
 
         startTickets = {"taxi": 10, "bus": 8, "underground": 4}
@@ -61,10 +61,10 @@ class Game:
 
             if self.cant_move(detective):
                 print("Detective {} can't move!".format(detective.name))
-                return
-            move = self.detectives_ai.play_move(copy.deepcopy(detective), copy.deepcopy(self.detectives),
+            else:
+                move = self.detectives_ai.play_move(copy.deepcopy(detective), copy.deepcopy(self.detectives),
                                                 copy.deepcopy(self.x_history))
-            self.perform_move(detective, move)
+                self.perform_move(detective, move)
 
         self.is_game_over()
 
@@ -100,10 +100,10 @@ class Game:
     def is_game_over(self):
         detectives_win = any(self.x.pos == plr.pos for plr in self.detectives)
         x_wins = all(self.cant_move(plr) for plr in self.detectives)
-        if x_wins:
+        if detectives_win:
             print("Mr. X Wins!")
             exit()
-        if detectives_win:
+        if x_wins:
             print("The detectives win!")
             exit()
 
@@ -131,5 +131,3 @@ class Game:
                 if len(data) > 0:
                     self.boardmap[int(data[0])] = entry
 
-    # self.detectives: an array of Player objects, but only the detcvitvs
-    # self.x: mr. x, a player object

@@ -37,4 +37,5 @@ with open("board_data.txt", "r") as f:
 # Play Move, takes mr x and returns the move he wishes to make
 # Returns: the chosen move, a tuple ((int) new location, (string) transport type)
 def play_move(mr_x: Player, detectives: List[Player], x_history: List[Tuple[int, str]]) -> Tuple[int, str]:
+    # Only returns taxi moves in this example
     return random.choice(boardmap[mr_x.pos]["taxi"]), "taxi"
