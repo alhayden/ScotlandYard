@@ -17,115 +17,90 @@ class Game:
         self.round = 0
         self.turn = 0
         self.reveal_rounds = [3, 8, 13, 18, 24]
-        
-        
-        startTickets = {"taxi" : 10, "bus" : 8, "underground" : "4"}
-        
+
+        startTickets = {"taxi": 10, "bus": 8, "underground": 4}
+
         startLocs = []
         with open("start_locations.txt", "r") as f:
             for line in f:
                 startLocs.append(int(line.strip()))
-        random.shuffle(startLocs)    
-        
-        self.x = Player({"taxi" : 100, "bus": 100, "underground" : 100, "black" : 5, "2x" : 2}, startLocs[0], "X")
+        random.shuffle(startLocs)
+
+        self.x = Player({"taxi": 100, "bus": 100, "underground": 100, "black": 5, "2x": 2}, startLocs[0], "X")
 
         names = ["A", "B", "C", "D", "E"]
 
         for n in range(len(names)):
             self.detectives.append(Player(dict(startTickets), startLocs[n + 1], names[n]))
-            
-        
-    def next_turn(self, doReset=True):
+
+    def next_turn(self):
         turn = self.turn
         self.turn += 1
-        
-        detectives_public = [copy.deepcopy(p) for p in self.detectives]
-        x_public = copy.deepcopy(self.x)
 
-        ## Mr. X's turn
         if turn <= 0:
-             self.mr_x_ai.play_move(x_public, detectives_public, copy.deepcopy(self.x_history))
+            # Mr. X's turn
+            move = self.mr_x_ai.play_move(copy.deepcopy(self.x), copy.deepcopy(self.detectives),
+                                          copy.deepcopy(self.x_history))
 
-        if self.x != x_public:
-            self.gameEnd(False) ## X loses
-
-        if x_public.nextMove[1] == "2x" and self.x.tickets["black"] > 0:
-            self.turn = -1
-            self.x.tickets["black"] = self.x.tickets["black"] - 1
-            return
-
-            if self.moveValid(x_public):
-                self.x.pos = x_public.nextMove[0]
-                transport = x_public.nextMove[1]
-                self.x.tickets[transport] = self.x.tickets[transport] - 1
-            if self.x.tickets[transport] < 0:
-                self.gameEnd(False) ## X loses
-
-            self.x_history.append((self.x.pos, transport))
-            return
-
-        ## Detective's turn
-        for i in range(len(self.x_history)):
-            if i in self.reveal_rounds:
-                x_history_public.append(self.x_history[i])
+            if move[0] == "2x":
+                self.x.tickets["2x"] -= 1
+                if self.x.tickets["2x"] < 0:
+                    raise RuntimeError(
+                        "Mr X: stop trying to be special - it isn't working.  attempted to use too many 2x tickets")
+                self.perform_move(self.x, move[2])
+                self.x_history.append((self.x.pos if self.x.pos in self.reveal_rounds else None, move[2][1]))
+                self.perform_move(self.x, move[3])
+                self.x_history.append((self.x.pos if self.x.pos in self.reveal_rounds else None, move[3][1]))
             else:
-                x_history_public.append((None, self.x_history[i][1]))
+                self.perform_move(self.x, move)
 
-        detective_public = self.detectives_public[turn - 1]
+        else:
+            # Detective's turn
+            detective = self.detectives[turn - 1]
 
-        self.detectives_ai.play_move(detective_public, detectives_public, copy.deepcopy(x_history_public))
+            if self.cant_move(detective):
+                return
+            move = self.detectives_ai.play_move(copy.deepcopy(detective), copy.deepcopy(self.detectives),
+                                                copy.deepcopy(self.x_history))
+            self.perform_move(detective, move)
 
+        self.is_game_over()
 
-        detective = self.detectives[turn - 1]
-        if detective != detective_public:
-            self.gameEnd(True) #X wins
-
-        if detective_public.nextMove == None and self.cantMove(detective_public):
-            return
-
-        if self.moveValid(detective_public):
-            detective.pos = detective_public.nextMove[0]
-            transport = detective_public.nextMove[1]
-            detective.tickets[transport] = detective.tickets[transport] - 1
-            if detective.tickets[transport] < 0:
-                self.gameEnd(True) ## X wins
-
-        self.checkGameOver()
-
-        if self.turn >= 6 and doReset:
+        if self.turn >= 6:
             self.turn = 0
             self.round += 1
-        
- 
 
     def next_round(self):
-        self.round += 1
+        for i in range(6):
+            self.next_turn()
 
-        self.detectives_public = [copy.deepcopy(p) for p in self.detectives]
-        self.x_public = copy.deepcopy(self.x)
+    def perform_move(self, player, move):
+        # check for legality of move
+        if move[0] not in self.boardmap[player.pos][move[1]] or any(move[0] == plr.pos for plr in self.detectives):
+            raise RuntimeError("{}: What kinda move is that??? move from {} to {} via {} ticket is illegal"
+                               .format(player.name, player.pos, move[0], move[1]))
+        player.pos = move[0]
+        transport = move[1]
+        player.tickets[transport] -= 1
+        if player.tickets[transport] < 0:
+            raise RuntimeError(
+                "{} used a {} ticket they didn't have!".format(player.name, transport))
 
-        self.turn = 0
-        while self.turn < 6:
-            self.next_turn(False)
-
-        
-    def moveValid(self, player):
-        return player.nextMove[0] in self.boardmap[player.pos][player.nextMove[1]]
-
-    def cantMove(self, player):
+    def cant_move(self, player):
+        print (player.tickets)
         for ticket in player.tickets.keys():
             if player.tickets[ticket] > 0 and ticket in self.boardmap[player.pos]:
                 return False
         return True
 
-    def checkGameOver(self):
-        return any(mrx.pos == plr.pos for plr in self.detectives)
+    def is_game_over(self):
+        return any(self.x.pos == plr.pos for plr in self.detectives)
 
-    def gameEnd(self, xwins):
+    def end_game(self, xwins):
         if xwins:
             print("Mr. X won!")
         else:
-            prin("The Detectives Won!")
+            print("The Detectives Won!")
 
     def load_board(self):
         t = "t"
@@ -141,19 +116,18 @@ class Game:
                     entry[b] = [int(a.strip()) for a in data[2].split(" ")]
                 if len(data) > 3 and data[3] != '':
                     entry[u] = [int(a.strip()) for a in data[3].split(" ")]
-                
-                blackTicket = []
+
+                black_ticket = []
                 for key in entry.keys():
-                    blackTicket += entry[key]
-    
-                entry["?"] = blackTicket
-                
+                    black_ticket += entry[key]
+
+                entry["?"] = black_ticket
+
                 if len(data) > 4:
                     entry["?"] += [int(a.strip()) for a in data[4].split(' ')]
-     
+
                 if len(data) > 0:
                     self.boardmap[int(data[0])] = entry
-
 
     # self.detectives: an array of Player objects, but only the detcvitvs
     # self.x: mr. x, a player object
