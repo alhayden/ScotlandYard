@@ -1,6 +1,7 @@
 #!/bin/python3
 
 import random
+import copy
 from .player import Player
 
 
@@ -34,13 +35,16 @@ class Game:
             self.detectives.append(Player(dict(startTickets), startLocs[n + 1], names[n]))
             
         
-    def next_turn(self):
+    def next_turn(self, doReset=True):
         turn = self.turn
         self.turn += 1
         
+        detectives_public = [copy.deepcopy(p) for p in self.detectives]
+        x_public = copy.deepcopy(self.x)
+
         ## Mr. X's turn
         if turn <= 0:
-             self.mr_x_ai.play_move(self.x_public, self.detectives_public, copy.deepcopy(self.x_history))
+             self.mr_x_ai.play_move(x_public, detectives_public, copy.deepcopy(self.x_history))
 
         if self.x != x_public:
             self.gameEnd(False) ## X loses
@@ -51,8 +55,8 @@ class Game:
             return
 
             if self.moveValid(x_public):
-                self.x.pos = self.x_public.nextMove[0]
-                transport = self.x_public.nextMove[1]
+                self.x.pos = x_public.nextMove[0]
+                transport = x_public.nextMove[1]
                 self.x.tickets[transport] = self.x.tickets[transport] - 1
             if self.x.tickets[transport] < 0:
                 self.gameEnd(False) ## X loses
@@ -69,7 +73,7 @@ class Game:
 
         detective_public = self.detectives_public[turn - 1]
 
-        self.detectives_ai.play_move(detective_public, self.detectives_public, copy.deepcopy(x_history_public))
+        self.detectives_ai.play_move(detective_public, detectives_public, copy.deepcopy(x_history_public))
 
 
         detective = self.detectives[turn - 1]
@@ -87,6 +91,10 @@ class Game:
                 self.gameEnd(True) ## X wins
 
         self.checkGameOver()
+
+        if self.turn >= 6 and doReset:
+            self.turn = 0
+            self.round += 1
         
  
 
@@ -98,7 +106,7 @@ class Game:
 
         self.turn = 0
         while self.turn < 6:
-            self.next_turn()
+            self.next_turn(False)
 
         
     def moveValid(self, player):
