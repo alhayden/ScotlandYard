@@ -39,14 +39,15 @@ class Game:
         self.turn += 1
         
         ## Mr. X's turn
-        if turn == 0:
+        if turn <= 0:
              self.mr_x_ai.play_move(self.x_public, self.detectives_public, copy.deepcopy(self.x_history))
 
         if self.x != x_public:
             self.gameEnd(False) ## X loses
 
-        if x_public.nextMove[1] == "2x":
-            self.turn = 0
+        if x_public.nextMove[1] == "2x" and self.x.tickets["black"] > 0:
+            self.turn = -1
+            self.x.tickets["black"] = self.x.tickets["black"] - 1
             return
 
             if self.moveValid(x_public):
