@@ -35,6 +35,8 @@ class Window(Tk):
         if not self.is_automoving:
             self.is_automoving = True
             self.automove()
+        else:
+            self.is_automoving = False
 
     def automove(self, *args):
         if not self.is_automoving:

@@ -37,5 +37,5 @@ with open("board_data.txt", "r") as f:
 # Play Move, takes mr x and returns the move he wishes to make
 # Returns: the chosen move, a tuple ((int) new location, (string) transport type)
 def play_move(detective: Player, detectives: List[Player], x_history: List[Tuple[int, str]]) -> Tuple[int, str]:
-    transport = random.choice(filter(lambda x: x[1] > 0 and x[1] in boardmap[detective.pos], detective.tickets.items()))[0]
+    transport = random.choice(list(filter(lambda x: x[1] > 0 and x[1] in boardmap[detective.pos], detective.tickets.items())))[0]
     return random.choice(boardmap[detective.pos][transport]), transport

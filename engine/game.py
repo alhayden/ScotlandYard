@@ -56,9 +56,11 @@ class Game:
 
         else:
             # Detective's turn
+            print(turn)
             detective = self.detectives[turn - 1]
 
             if self.cant_move(detective):
+                print("Detective {} can't move!".format(detective.name))
                 return
             move = self.detectives_ai.play_move(copy.deepcopy(detective), copy.deepcopy(self.detectives),
                                                 copy.deepcopy(self.x_history))
@@ -87,7 +89,8 @@ class Game:
                 "{} used a {} ticket they didn't have!".format(player.name, transport))
 
     def cant_move(self, player):
-        print (player.tickets)
+        print(player.tickets)
+        print(player)
         for ticket in player.tickets.keys():
             if player.tickets[ticket] > 0 and ticket in self.boardmap[player.pos]:
                 return False
@@ -103,28 +106,25 @@ class Game:
             print("The Detectives Won!")
 
     def load_board(self):
-        t = "t"
-        b = "b"
-        u = "u"
         with open("board_data.txt", "r") as f:
             for line in f:
                 data = [a.strip() for a in line.split("|")]
                 entry = {}
                 if len(data) > 1 and data[1] != '':
-                    entry[t] = [int(a.strip()) for a in data[1].split(" ")]
+                    entry["taxi"] = [int(a.strip()) for a in data[1].split(" ")]
                 if len(data) > 2 and data[2] != '':
-                    entry[b] = [int(a.strip()) for a in data[2].split(" ")]
+                    entry["bus"] = [int(a.strip()) for a in data[2].split(" ")]
                 if len(data) > 3 and data[3] != '':
-                    entry[u] = [int(a.strip()) for a in data[3].split(" ")]
+                    entry["underground"] = [int(a.strip()) for a in data[3].split(" ")]
 
                 black_ticket = []
                 for key in entry.keys():
                     black_ticket += entry[key]
 
-                entry["?"] = black_ticket
+                entry["black"] = black_ticket
 
                 if len(data) > 4:
-                    entry["?"] += [int(a.strip()) for a in data[4].split(' ')]
+                    entry["black"] += [int(a.strip()) for a in data[4].split(' ')]
 
                 if len(data) > 0:
                     self.boardmap[int(data[0])] = entry
