@@ -36,7 +36,6 @@ class Game:
     def next_turn(self):
         turn = self.turn
         self.turn += 1
-        print("Turn {}".format(turn))
 
         if turn <= 0:
             # Mr. X's turn
@@ -57,17 +56,12 @@ class Game:
 
         else:
             # Detective's turn
+            print(turn)
             detective = self.detectives[turn - 1]
 
             if self.cant_move(detective):
                 print("Detective {} can't move!".format(detective.name))
-                self.is_game_over()
-
-                if self.turn >= 6:
-                    self.turn = 0
-                    self.round += 1
                 return
-
             move = self.detectives_ai.play_move(copy.deepcopy(detective), copy.deepcopy(self.detectives),
                                                 copy.deepcopy(self.x_history))
             self.perform_move(detective, move)
