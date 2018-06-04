@@ -36,6 +36,7 @@ class Game:
     def next_turn(self):
         turn = self.turn
         self.turn += 1
+        print("Turn {}".format(turn))
 
         if turn <= 0:
             # Mr. X's turn
@@ -56,12 +57,17 @@ class Game:
 
         else:
             # Detective's turn
-            print(turn)
             detective = self.detectives[turn - 1]
 
             if self.cant_move(detective):
                 print("Detective {} can't move!".format(detective.name))
+                self.is_game_over()
+
+                if self.turn >= 6:
+                    self.turn = 0
+                    self.round += 1
                 return
+
             move = self.detectives_ai.play_move(copy.deepcopy(detective), copy.deepcopy(self.detectives),
                                                 copy.deepcopy(self.x_history))
             self.perform_move(detective, move)
@@ -78,9 +84,12 @@ class Game:
 
     def perform_move(self, player, move):
         # check for legality of move
-        if move[0] not in self.boardmap[player.pos][move[1]] or any(move[0] == plr.pos for plr in self.detectives):
+        if move[0] not in self.boardmap[player.pos][move[1]]:
             raise RuntimeError("{}: What kinda move is that??? move from {} to {} via {} ticket is illegal"
                                .format(player.name, player.pos, move[0], move[1]))
+        if player is not self.x and any(move[0] == plr.pos for plr in self.detectives):
+            raise RuntimeError(
+                "{}: This town ain't big enough for the two of us! node {} has two people".format(player.name, move[0]))
         player.pos = move[0]
         transport = move[1]
         player.tickets[transport] -= 1
@@ -89,21 +98,20 @@ class Game:
                 "{} used a {} ticket they didn't have!".format(player.name, transport))
 
     def cant_move(self, player):
-        print(player.tickets)
-        print(player)
         for ticket in player.tickets.keys():
             if player.tickets[ticket] > 0 and ticket in self.boardmap[player.pos]:
                 return False
         return True
 
     def is_game_over(self):
-        return any(self.x.pos == plr.pos for plr in self.detectives)
-
-    def end_game(self, xwins):
-        if xwins:
-            print("Mr. X won!")
-        else:
-            print("The Detectives Won!")
+        detectives_win = any(self.x.pos == plr.pos for plr in self.detectives)
+        x_wins = all(self.cant_move(plr) for plr in self.detectives)
+        if x_wins:
+            print("Mr. X Wins!")
+            exit()
+        if detectives_win:
+            print("The detectives win!")
+            exit()
 
     def load_board(self):
         with open("board_data.txt", "r") as f:
