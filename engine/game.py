@@ -35,7 +35,7 @@ class Game:
             self.detectives.append(Player(dict(startTickets), startLocs[n + 1], names[n]))
             
         
-    def next_turn(self, doReset=True):
+    def next_turn(self):
         turn = self.turn
         self.turn += 1
         
@@ -92,21 +92,15 @@ class Game:
 
         self.checkGameOver()
 
-        if self.turn >= 6 and doReset:
+        if self.turn >= 6:
             self.turn = 0
             self.round += 1
         
  
 
     def next_round(self):
-        self.round += 1
-
-        self.detectives_public = [copy.deepcopy(p) for p in self.detectives]
-        self.x_public = copy.deepcopy(self.x)
-
-        self.turn = 0
-        while self.turn < 6:
-            self.next_turn(False)
+        for i in range(6):
+            self.next_turn()
 
         
     def moveValid(self, player):
