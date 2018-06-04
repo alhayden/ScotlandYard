@@ -83,7 +83,7 @@ class Game:
                                .format(player.name, player.pos, move[0], move[1]))
         if player is not self.x and any(move[0] == plr.pos for plr in self.detectives):
             raise RuntimeError(
-                "{}: This town ain't big enough for the two of us! node {} has two people".format(player.name, move[0]))
+                    "{}: This node ain't big enough for the both of us! node {} has two people".format(player.name, move[0]))
         player.pos = move[0]
         transport = move[1]
         player.tickets[transport] -= 1
