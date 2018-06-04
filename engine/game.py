@@ -61,10 +61,10 @@ class Game:
 
             if self.cant_move(detective):
                 print("Detective {} can't move!".format(detective.name))
-                return
-            move = self.detectives_ai.play_move(copy.deepcopy(detective), copy.deepcopy(self.detectives),
+            else:
+                move = self.detectives_ai.play_move(copy.deepcopy(detective), copy.deepcopy(self.detectives),
                                                 copy.deepcopy(self.x_history))
-            self.perform_move(detective, move)
+                self.perform_move(detective, move)
 
         self.is_game_over()
 
@@ -78,9 +78,13 @@ class Game:
 
     def perform_move(self, player, move):
         # check for legality of move
-        if move[0] not in self.boardmap[player.pos][move[1]] or any(move[0] == plr.pos for plr in self.detectives):
+        if move[0] not in self.boardmap[player.pos][move[1]]:
             raise RuntimeError("{}: What kinda move is that??? move from {} to {} via {} ticket is illegal"
                                .format(player.name, player.pos, move[0], move[1]))
+        
+        if any(move[0] == plr.pos for plr in self.detectives):
+            raise RuntimeError("{}: You cannot move to {}, you would bump into {}".format(player.name, move[0], list(filter(lambda plr: plr.pos == move[0], self.detectives))[0].name))
+        
         player.pos = move[0]
         transport = move[1]
         player.tickets[transport] -= 1
