@@ -4,7 +4,10 @@ from tkinter import Tk, Canvas, Label, Button, Scale
 class Window(Tk):
     def __init__(self, game):
         Tk.__init__(self)
+        # for 4k
+        self.tk.call('tk', 'scaling', '-displayof', '.', 1)
         self.game = game
+        self.is_automoving = False
 
         # create widgets
         self.board_canvas = Canvas(self)
@@ -19,9 +22,6 @@ class Window(Tk):
         self.button_next_turn.grid(row=1, column=1)
         self.slider_automove_speed.grid(row=2, column=1)
         self.button_toggle_automove.grid(row=3, column=1)
-
-        # for 4k
-        self.tk.call('tk', 'scaling', 5.0)
         
     def next_turn(self, *args):
         print(self.winfo_pixels('1i'))
@@ -32,7 +32,13 @@ class Window(Tk):
         pass
 
     def toggle_automove(self, *args):
-        pass
+        if not self.is_automoving:
+            self.is_automoving = True
+            self.automove()
 
     def automove(self, *args):
-        pass
+        if not self.is_automoving:
+            return
+        self.next_turn()
+
+        self.after(self.slider_automove_speed.get(), self.automove)
