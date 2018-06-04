@@ -4,3 +4,7 @@ mrx.py
 detectives.py
 
 *.pyc
+
+__pycache__
+
+.idea
