@@ -18,7 +18,7 @@ class Game:
         self.turn = 0
         self.reveal_rounds = [3, 8, 13, 18, 24]
 
-        startTickets = {"taxi": 10, "bus": 8, "underground": "4"}
+        startTickets = {"taxi": 10, "bus": 8, "underground": 4}
 
         startLocs = []
         with open("start_locations.txt", "r") as f:
@@ -87,6 +87,7 @@ class Game:
                 "{} used a {} ticket they didn't have!".format(player.name, transport))
 
     def cant_move(self, player):
+        print (player.tickets)
         for ticket in player.tickets.keys():
             if player.tickets[ticket] > 0 and ticket in self.boardmap[player.pos]:
                 return False
