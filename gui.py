@@ -3,6 +3,8 @@ from tkinter import Tk, Canvas, Label, Button, Scale, Frame
 from PIL import ImageTk, Image
 from engine.game import Game
 
+UNSCALED_RECT_SIZE = 0.04
+
 
 class Window(Tk):
     def __init__(self, game: Game):
@@ -40,11 +42,11 @@ class Window(Tk):
         self.player_txts = [self.board_canvas.create_text(0, 0, text=plr.name) for plr in self.game.players]
 
         # create data for node locations on image
-        node_locations = {}
+        self.node_locations = {}
         with open("node_locations.txt", "r") as f:
             for line in f:
                 l = line.split(" ")
-                node_locations[int(l[0])] = (float(l[1]), float(l[2]))
+                self.node_locations[int(l[0])] = (float(l[1]), float(l[2]))
 
     def next_turn(self, *_):
         self.game.next_turn()
@@ -61,7 +63,13 @@ class Window(Tk):
             self.img_id = self.board_canvas.create_image(int(width / 2), int(height / 2), image=self.board_img)
 
         for i, player in self.game.players:
-            pass
+            x, y = self.node_locations[player.pos]
+            x *= width
+            y *= height
+            self.board_canvas.coords(self.player_rects[i], x + width * UNSCALED_RECT_SIZE,
+                                     y + width * UNSCALED_RECT_SIZE, x - width * UNSCALED_RECT_SIZE,
+                                     y - width * UNSCALED_RECT_SIZE)
+            self.board_canvas.move(self.player_txts[i], x, y)
 
     def toggle_automove(self, *_):
         if not self.is_automoving:
