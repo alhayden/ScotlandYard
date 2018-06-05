@@ -40,8 +40,8 @@ class Window(Tk):
 
         # move image on resize
         self.bind("<Configure>", self.update_ui)
-        self.player_colors = ["red", "orange", "yellow", "green", "blue", "purple"]
-        random.shuffle(self.player_colors)
+        self.player_colors = ["black", "orange", "yellow", "green", "blue", "purple"]
+        #random.shuffle(self.player_colors)
         self.old_canvas_size = self.winfo_width(), self.winfo_height()
         self.player_rects = [self.board_canvas.create_rectangle(0, 0, 1, 1, fill=self.player_colors[i]) for i in
                              range(len(self.game.players))]

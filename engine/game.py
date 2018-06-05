@@ -14,8 +14,8 @@ class Game:
         self.detectives = []
         self.x = None
         self.load_board()
-        self.round = 0
-        self.turn = 1
+        self.round = 1
+        self.turn = 0
         self.reveal_rounds = [3, 8, 13, 18, 24]
 
         startTickets = {"taxi": 10, "bus": 8, "underground": 4}
@@ -50,15 +50,17 @@ class Game:
                     raise RuntimeError(
                         "Mr X: stop trying to be special - it isn't working.  attempted to use too many 2x tickets")
                 self.perform_move(self.x, move[2])
-                self.x_history.append((self.x.pos if self.x.pos in self.reveal_rounds else None, move[2][1]))
+                self.x_history.append((self.x.pos if self.round in self.reveal_rounds else None, move[2][1]))
                 self.perform_move(self.x, move[3])
-                self.x_history.append((self.x.pos if self.x.pos in self.reveal_rounds else None, move[3][1]))
+                self.x_history.append((self.x.pos if self.round in self.reveal_rounds else None, move[3][1]))
             else:
                 self.perform_move(self.x, move)
+                self.x_history.append((self.x.pos if self.round in self.reveal_rounds else None, move[1]))
+
+            print("X Ledger is updated to ", self.x_history)
 
         else:
             # Detective's turn
-            print(turn)
             detective = self.detectives[turn - 1]
 
             if self.cant_move(detective):
@@ -93,6 +95,8 @@ class Game:
             raise RuntimeError(
                 "{} used a {} ticket they didn't have!".format(player.name, transport))
 
+        print("{} moved to {} using {}".format(player.name, move[0], move[1]))
+
     def cant_move(self, player):
         for ticket in player.tickets.keys():
             if player.tickets[ticket] > 0 and ticket in self.boardmap[player.pos]:
@@ -103,10 +107,10 @@ class Game:
         detectives_win = any(self.x.pos == plr.pos for plr in self.detectives)
         x_wins = all(self.cant_move(plr) for plr in self.detectives)
         if detectives_win:
-            print("Mr. X Wins!")
+            print("The detectives win!")
             exit()
         if x_wins:
-            print("The detectives win!")
+            print("Mr X wins!")
             exit()
 
     def load_board(self):
