@@ -22,7 +22,7 @@ class Window(Tk):
         self.control_frame = Frame(self)
         self.label_current_player = Label(self.control_frame, text="Current Player: X")
         self.button_next_turn = Button(self.control_frame, text="Next Turn", command=self.next_turn)
-        self.slider_automove_speed = scale = Scale(self.control_frame, orient='horizontal', from_=0, to_=10000)
+        self.slider_automove_speed = scale = Scale(self.control_frame, orient='horizontal', from_=0, to_=2000)
         self.button_toggle_automove = Button(self.control_frame, text="Start Automove", command=self.toggle_automove)
 
         # layout widgets
@@ -62,7 +62,7 @@ class Window(Tk):
         except:
             w, h = self.board_canvas.winfo_width(), self.board_canvas.winfo_height()
             self.board_canvas.create_rectangle(w / 4, h / 4, w * 3 / 4, h * 3 / 4, fill="red")
-            self.board_canvas.create_text(w / 2, h / 2, text="EXCEPTION, STOP GAME PLZ", font="Helvetica 36")
+            self.board_canvas.create_text(w / 2, h / 2, text="EXCEPTION OCCURED; CHECK LOG", font="Helvetica 36")
             raise
         self.update_ui()
 
