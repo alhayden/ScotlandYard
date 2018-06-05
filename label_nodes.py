@@ -10,7 +10,7 @@ cnv.create_image(500, 500, image=img)
 n = 1
 def callback(evt):
     global n
-    print(n, evt.x, evt.y)
+    print(n, evt.x / 1000, evt.y / 1000)
     n += 1
 
 cnv.bind("<Button-1>", callback)
