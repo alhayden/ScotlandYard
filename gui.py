@@ -57,10 +57,12 @@ class Window(Tk):
     def next_turn(self, *_):
         try:
             self.game.next_turn()
+            self.label_current_player.configure(
+                text="Current Player: {}".format(self.game.players[self.game.turn].name))
         except:
             w, h = self.board_canvas.winfo_width(), self.board_canvas.winfo_height()
             self.board_canvas.create_rectangle(w / 4, h / 4, w * 3 / 4, h * 3 / 4, fill="red")
-            self.board_canvas.create_text(w/2, h/2, text="EXCEPTION, STOP GAME PLZ", font="Helvetica 36")
+            self.board_canvas.create_text(w / 2, h / 2, text="EXCEPTION, STOP GAME PLZ", font="Helvetica 36")
             raise
         self.update_ui()
 
