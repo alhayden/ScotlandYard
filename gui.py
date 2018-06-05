@@ -20,7 +20,7 @@ class Window(Tk):
         # create widgets
         self.board_canvas = Canvas(self, background="white")
         self.control_frame = Frame(self)
-        self.label_current_player = Label(self.control_frame, text="Current Player: Mr. X")
+        self.label_current_player = Label(self.control_frame, text="Current Player: X")
         self.button_next_turn = Button(self.control_frame, text="Next Turn", command=self.next_turn)
         self.slider_automove_speed = scale = Scale(self.control_frame, orient='horizontal', from_=0, to_=10000)
         self.button_toggle_automove = Button(self.control_frame, text="Start Automove", command=self.toggle_automove)
@@ -40,7 +40,7 @@ class Window(Tk):
 
         # move image on resize
         self.bind("<Configure>", self.update_ui)
-        self.player_colors = ["black", "orange", "yellow", "green", "blue", "purple"]
+        self.player_colors = ["black", "red", "yellow", "green", "blue", "purple"]
         #random.shuffle(self.player_colors)
         self.old_canvas_size = self.winfo_width(), self.winfo_height()
         self.player_rects = [self.board_canvas.create_rectangle(0, 0, 1, 1, fill=self.player_colors[i]) for i in
@@ -84,7 +84,7 @@ class Window(Tk):
             self.board_canvas.coords(self.player_rects[i], x + width * UNSCALED_RECT_SIZE,
                                      y + width * UNSCALED_RECT_SIZE, x - width * UNSCALED_RECT_SIZE,
                                      y - width * UNSCALED_RECT_SIZE)
-            self.board_canvas.move(self.player_txts[i], x, y)
+            self.board_canvas.coords(self.player_txts[i], x, y)
             self.board_canvas.lift(self.player_rects[i])
             self.board_canvas.lift(self.player_txts[i])
 
