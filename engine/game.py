@@ -33,6 +33,8 @@ class Game:
         for n in range(len(names)):
             self.detectives.append(Player(dict(startTickets), startLocs[n + 1], names[n]))
 
+        self.players = self.detectives.copy() + [self.x]
+
     def next_turn(self):
         turn = self.turn
         self.turn += 1
