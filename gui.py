@@ -35,6 +35,14 @@ class Window(Tk):
 
         # move image on resize
         self.bind("<Configure>", self.update_ui)
+        
+        # create data for node locations on image
+        node_locations = {}
+        with open("node_locations.txt", "r") as f:
+            for line in f:
+                l = line.split(" ")
+                node_locations[int(l[0])] = (float(l[1]), float(l[2]))
+
 
     def next_turn(self, *args):
         self.game.next_turn()
