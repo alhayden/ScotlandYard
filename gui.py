@@ -2,6 +2,7 @@
 from tkinter import Tk, Canvas, Label, Button, Scale, Frame
 from PIL import ImageTk, Image
 from engine.game import Game
+import random
 
 UNSCALED_RECT_SIZE = 0.04
 
@@ -11,6 +12,8 @@ class Window(Tk):
         Tk.__init__(self)
         # for 4k
         self.tk.call('tk', 'scaling', '-displayof', '.', 1)
+
+        # setup variables
         self.game = game
         self.is_automoving = False
 
@@ -37,8 +40,11 @@ class Window(Tk):
 
         # move image on resize
         self.bind("<Configure>", self.update_ui)
+        self.player_colors = ["red", "orange", "yellow", "green", "blue", "purple"]
+        random.shuffle(self.player_colors)
         self.old_canvas_size = self.winfo_width(), self.winfo_height()
-        self.player_rects = [self.board_canvas.create_rectangle(0, 0, 1, 1, fill="red") for _ in self.game.players]
+        self.player_rects = [self.board_canvas.create_rectangle(0, 0, 1, 1, fill=self.player_colors[i]) for i in
+                             range(len(self.game.players))]
         self.player_txts = [self.board_canvas.create_text(0, 0, text=plr.name) for plr in self.game.players]
 
         # create data for node locations on image

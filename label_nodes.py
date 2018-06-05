@@ -2,11 +2,11 @@ from tkinter import Tk, Canvas
 from PIL import ImageTk, Image
 
 root = Tk()
-cnv = Canvas(root, width=1000, height=1000)
+cnv = Canvas(root, width=2000, height=2000)
 img = Image.open("board.jpg")
-img = img.resize((1000, 1000))
+img = img.resize((2000, 2000))
 img = ImageTk.PhotoImage(image=img)
-cnv.create_image(500, 500, image=img)
+cnv.create_image(1000, 1000, image=img)
 n = 1
 def callback(evt):
     global n
