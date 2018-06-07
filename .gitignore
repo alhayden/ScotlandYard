@@ -1,7 +1,9 @@
 config.txt
 
 mrx.py
+mrx
 detectives.py
+detectives
 
 *.pyc
 
