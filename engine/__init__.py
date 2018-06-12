@@ -25,7 +25,7 @@ with open("board_data.txt", "r") as f:
         entry["black"] = blackTicket
 
         if len(data) > 4:
-            entry["black"] += [int(a.strip()) for a in data[4].split(' ')]
+            entry["black"] += list(set([int(a.strip()) for a in data[4].split(' ')]))
 
         if len(data) > 0:
             boardmap[int(data[0])] = entry
